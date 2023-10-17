@@ -93,7 +93,7 @@ mod metadata_aliases {
         oracle::events::FeedValues as FeedValuesEvent,
     };
 
-    pub use metadata::loans::events::{NewMarket as NewMarketEvent, UpdatedMarket as UpdatedMarketEvent};
+    //pub use metadata::loans::events::{NewMarket as NewMarketEvent, UpdatedMarket as UpdatedMarketEvent};
 
     pub use metadata::issue::events::{
         CancelIssue as CancelIssueEvent, ExecuteIssue as ExecuteIssueEvent, RequestIssue as RequestIssueEvent,
@@ -123,7 +123,7 @@ mod metadata_aliases {
         orml_traits::asset_registry::AssetMetadata as GenericAssetMetadata,
     };
     pub type AssetMetadata = GenericAssetMetadata<Balance, InterBtcAdditionalMetadata>;
-    pub type LendingMarket = metadata::runtime_types::loans::types::Market<Balance>;
+    //pub type LendingMarket = metadata::runtime_types::loans::types::Market<Balance>;
     pub type KeyStorageAddress<T> = Address<StaticStorageMapKey, T, (), (), Yes>;
 
     pub use metadata::runtime_types::{
@@ -161,7 +161,7 @@ mod metadata_aliases {
     pub type VaultCurrencyPair = metadata::runtime_types::interbtc_primitives::VaultCurrencyPair<CurrencyId>;
 
     #[cfg(feature = "parachain-metadata-interlay")]
-    pub type EncodedCall = metadata::runtime_types::interlay_runtime_parachain::RuntimeCall;
+    pub type EncodedCall = metadata::runtime_types::ggxchain_runtime_brooklyn::RuntimeCall;
     #[cfg(feature = "parachain-metadata-kintsugi")]
     pub type EncodedCall = metadata::runtime_types::kintsugi_runtime_parachain::RuntimeCall;
 

@@ -102,11 +102,11 @@ pub struct ConnectionOpts {
     /// Parachain websocket URL.
     #[cfg_attr(
         feature = "parachain-metadata-kintsugi",
-        clap(long, default_value = "wss://api-kusama.interlay.io:443/parachain")
+        clap(long, default_value = "ws://127.0.0.1:9944")
     )]
     #[cfg_attr(
         feature = "parachain-metadata-interlay",
-        clap(long, default_value = "wss://api.interlay.io:443/parachain")
+        clap(long, default_value = "ws://127.0.0.1:9944")
     )]
     pub btc_parachain_url: String,
 

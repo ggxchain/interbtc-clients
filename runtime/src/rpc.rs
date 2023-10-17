@@ -55,9 +55,9 @@ compile_error!("Tests are only supported for the kintsugi runtime");
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "parachain-metadata-interlay")] {
-        const DEFAULT_SPEC_VERSION: Range<u32> = 1025000..1026000;
-        pub const DEFAULT_SPEC_NAME: &str = "interlay-parachain";
-        pub const SS58_PREFIX: u16 = 2032;
+        const DEFAULT_SPEC_VERSION: Range<u32> = 1..1026000;
+        pub const DEFAULT_SPEC_NAME: &str = "ggxchain-node";
+        pub const SS58_PREFIX: u16 = 42;
     } else if #[cfg(feature = "parachain-metadata-kintsugi")] {
         const DEFAULT_SPEC_VERSION: Range<u32> = 1025000..1026000;
         pub const DEFAULT_SPEC_NAME: &str = "kintsugi-parachain";
@@ -636,33 +636,33 @@ impl InterBtcParachain {
 
     /// Cache new markets and updates
     pub async fn listen_for_lending_markets(&self) -> Result<(), Error> {
-        futures::future::try_join(
-            self.on_event::<NewMarketEvent, _, _, _>(
-                |event| async move {
-                    if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id) {
-                        log::error!(
-                            "Failed to register lend token {:?}: {}",
-                            event.underlying_currency_id,
-                            err
-                        );
-                    }
-                },
-                |_| {},
-            ),
-            self.on_event::<UpdatedMarketEvent, _, _, _>(
-                |event| async move {
-                    if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id) {
-                        log::error!(
-                            "Failed to update lend token {:?}: {}",
-                            event.underlying_currency_id,
-                            err
-                        );
-                    }
-                },
-                |_| {},
-            ),
-        )
-        .await?;
+        // futures::future::try_join(
+        //     self.on_event::<NewMarketEvent, _, _, _>(
+        //         |event| async move {
+        //             if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id) {
+        //                 log::error!(
+        //                     "Failed to register lend token {:?}: {}",
+        //                     event.underlying_currency_id,
+        //                     err
+        //                 );
+        //             }
+        //         },
+        //         |_| {},
+        //     ),
+        //     self.on_event::<UpdatedMarketEvent, _, _, _>(
+        //         |event| async move {
+        //             if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id) {
+        //                 log::error!(
+        //                     "Failed to update lend token {:?}: {}",
+        //                     event.underlying_currency_id,
+        //                     err
+        //                 );
+        //             }
+        //         },
+        //         |_| {},
+        //     ),
+        // )
+        // .await?;
         Ok(())
     }
 
@@ -779,17 +779,18 @@ impl UtilFuncs for InterBtcParachain {
     }
 
     async fn get_lend_tokens(&self) -> Result<Vec<(CurrencyId, CurrencyId)>, Error> {
-        let key_addr = metadata::storage().loans().markets_root();
-        let markets = self
-            .get_decoded_storage_keys::<_, CurrencyId>(key_addr, StorageMapHasher::Blake2_128)
-            .await?;
-        let ret = markets
-            .into_iter()
-            .map(|(underlying_currency_id, market)| {
-                let lend_token_id = market.lend_token_id;
-                (underlying_currency_id, lend_token_id)
-            })
-            .collect();
+        // let key_addr = metadata::storage().loans().markets_root();
+        // let markets = self
+        //     .get_decoded_storage_keys::<_, CurrencyId>(key_addr, StorageMapHasher::Blake2_128)
+        //     .await?;
+        // let ret = markets
+        //     .into_iter()
+        //     .map(|(underlying_currency_id, market)| {
+        //         let lend_token_id = market.lend_token_id;
+        //         (underlying_currency_id, lend_token_id)
+        //     })
+        //     .collect();
+        let ret = vec![];
         Ok(ret)
     }
 
@@ -839,7 +840,7 @@ impl CollateralBalancesPallet for InterBtcParachain {
                 .into_iter()
                 .map(|(amount, currency_id)| {
                     EncodedCall::Tokens(metadata::runtime_types::orml_tokens::module::Call::transfer {
-                        dest: recipient.clone(),
+                        dest: subxt::utils::MultiAddress::Id(recipient.clone()),
                         currency_id,
                         amount,
                     })
@@ -1924,7 +1925,7 @@ impl SudoPallet for InterBtcParachain {
                     .into_iter()
                     .map(|(recipient, free, reserved, currency_id)| {
                         EncodedCall::Tokens(metadata::runtime_types::orml_tokens::module::Call::set_balance {
-                            who: recipient,
+                            who: subxt::utils::MultiAddress::Id(recipient),
                             currency_id,
                             new_free: free,
                             new_reserved: reserved,
