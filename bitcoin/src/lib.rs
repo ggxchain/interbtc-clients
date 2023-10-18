@@ -1,5 +1,4 @@
 #![feature(int_roundings)]
-#![feature(option_result_contains)]
 
 pub mod cli;
 pub mod light;

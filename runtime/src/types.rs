@@ -378,6 +378,7 @@ mod dispatch_error {
         Unsupported,
         CannotCreateHold,
         NotExpendable,
+        Blocked,
     );
 
     convert_enum!(
@@ -410,6 +411,7 @@ mod dispatch_error {
                 RichDispatchError::Exhausted => DispatchError::Exhausted,
                 RichDispatchError::Corruption => DispatchError::Corruption,
                 RichDispatchError::Unavailable => DispatchError::Unavailable,
+                RichDispatchError::RootNotAllowed => DispatchError::RootNotAllowed,
             }
         }
     }

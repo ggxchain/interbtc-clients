@@ -639,8 +639,8 @@ impl InterBtcParachain {
         // futures::future::try_join(
         //     self.on_event::<NewMarketEvent, _, _, _>(
         //         |event| async move {
-        //             if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id) {
-        //                 log::error!(
+        //             if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id)
+        // {                 log::error!(
         //                     "Failed to register lend token {:?}: {}",
         //                     event.underlying_currency_id,
         //                     err
@@ -651,8 +651,8 @@ impl InterBtcParachain {
         //     ),
         //     self.on_event::<UpdatedMarketEvent, _, _, _>(
         //         |event| async move {
-        //             if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id) {
-        //                 log::error!(
+        //             if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id)
+        // {                 log::error!(
         //                     "Failed to update lend token {:?}: {}",
         //                     event.underlying_currency_id,
         //                     err

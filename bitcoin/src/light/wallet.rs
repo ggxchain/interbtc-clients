@@ -339,9 +339,11 @@ impl Wallet {
         while let Some(Ok(utxo)) = utxo_stream.next().await {
             log::info!("Found utxo: {}", utxo.outpoint.txid);
 
-            if prev_txid.contains(&utxo.outpoint.txid) {
-                // skip if trying to spend from the tx we are replacing
-                continue;
+            if let Some(txid) = prev_txid {
+                if txid == utxo.outpoint.txid {
+                    // skip if trying to spend from the tx we are replacing
+                    continue;
+                }
             }
 
             let script_pubkey = self.electrs.get_script_pubkey(utxo.outpoint).await?;
@@ -391,7 +393,7 @@ impl Wallet {
                 if let Some(change_pos) = n_change_pos_in_out {
                     if fee_needed < n_fee_ret {
                         log::info!("Fee needed is less than expected");
-                        let mut change_output = &mut psbt.unsigned_tx.output[change_pos];
+                        let change_output = &mut psbt.unsigned_tx.output[change_pos];
                         change_output.value += n_fee_ret - fee_needed;
                     }
                 }

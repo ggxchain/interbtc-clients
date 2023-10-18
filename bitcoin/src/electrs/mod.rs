@@ -284,8 +284,12 @@ impl ElectrsClient {
                 .vout
                 .iter()
                 .filter_map(|vout| {
-                    if vout.scriptpubkey_address.contains(&address) {
-                        Some(vout.value)
+                    if let Some(scriptpubkey_address) = vout.scriptpubkey_address.clone() {
+                        if scriptpubkey_address == address {
+                            Some(vout.value)
+                        } else {
+                            None
+                        }
                     } else {
                         None
                     }

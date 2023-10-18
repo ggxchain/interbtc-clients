@@ -42,6 +42,6 @@ pub enum Error {
 
 impl Error {
     pub fn is_not_found(&self) -> bool {
-        matches!(self, Error::ReqwestError(err) if err.status().contains(&StatusCode::NOT_FOUND))
+        matches!(self, Error::ReqwestError(err) if err.status().unwrap_or_default() == StatusCode::NOT_FOUND)
     }
 }
