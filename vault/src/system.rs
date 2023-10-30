@@ -686,14 +686,14 @@ impl VaultService {
 
         tracing::info!("Starting all services...");
         let tasks = vec![
-            (
-                "Registered Asset Listener",
-                run(listen_for_registered_assets(self.btc_parachain.clone())),
-            ),
-            (
-                "Lending Market Listener",
-                run(listen_for_lending_markets(self.btc_parachain.clone())),
-            ),
+            // (
+            //     "Registered Asset Listener",
+            //     run(listen_for_registered_assets(self.btc_parachain.clone())),
+            // ),
+            // (
+            //     "Lending Market Listener",
+            //     run(listen_for_lending_markets(self.btc_parachain.clone())),
+            // ),
             (
                 "Fee Estimate Listener",
                 run(listen_for_fee_rate_estimate_changes(self.btc_parachain.clone())),
@@ -729,43 +729,43 @@ impl VaultService {
                 )
                 .handle_cancellation::<IssueCanceller>(issue_event_rx)),
             ),
-            (
-                "Request Replace Listener",
-                run(listen_for_replace_requests(
-                    self.btc_parachain.clone(),
-                    self.vault_id_manager.clone(),
-                    replace_event_tx.clone(),
-                    !self.config.no_auto_replace,
-                )),
-            ),
-            (
-                "Accept Replace Listener",
-                run(listen_for_accept_replace(
-                    self.shutdown.clone(),
-                    self.btc_parachain.clone(),
-                    self.vault_id_manager.clone(),
-                    num_confirmations,
-                    self.config.payment_margin_minutes,
-                    self.config.auto_rbf,
-                )),
-            ),
-            (
-                "Execute Replace Listener",
-                run(listen_for_execute_replace(
-                    self.btc_parachain.clone(),
-                    replace_event_tx.clone(),
-                )),
-            ),
-            (
-                "Replace Cancellation Scheduler",
-                run(CancellationScheduler::new(
-                    self.btc_parachain.clone(),
-                    startup_height,
-                    initial_btc_height,
-                    account_id.clone(),
-                )
-                .handle_cancellation::<ReplaceCanceller>(replace_event_rx)),
-            ),
+            // (
+            //     "Request Replace Listener",
+            //     run(listen_for_replace_requests(
+            //         self.btc_parachain.clone(),
+            //         self.vault_id_manager.clone(),
+            //         replace_event_tx.clone(),
+            //         !self.config.no_auto_replace,
+            //     )),
+            // ),
+            // (
+            //     "Accept Replace Listener",
+            //     run(listen_for_accept_replace(
+            //         self.shutdown.clone(),
+            //         self.btc_parachain.clone(),
+            //         self.vault_id_manager.clone(),
+            //         num_confirmations,
+            //         self.config.payment_margin_minutes,
+            //         self.config.auto_rbf,
+            //     )),
+            // ),
+            // (
+            //     "Execute Replace Listener",
+            //     run(listen_for_execute_replace(
+            //         self.btc_parachain.clone(),
+            //         replace_event_tx.clone(),
+            //     )),
+            // ),
+            // (
+            //     "Replace Cancellation Scheduler",
+            //     run(CancellationScheduler::new(
+            //         self.btc_parachain.clone(),
+            //         startup_height,
+            //         initial_btc_height,
+            //         account_id.clone(),
+            //     )
+            //     .handle_cancellation::<ReplaceCanceller>(replace_event_rx)),
+            // ),
             (
                 "Parachain Block Listener",
                 run(active_block_listener(
