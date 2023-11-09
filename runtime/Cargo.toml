@@ -51,13 +51,13 @@ tempdir = { version = "0.3.7", optional = true }
 rand = { version = "0.7", optional = true }
 
 [dependencies.primitives]
-git = "https://github.com/interlay/interbtc"
-rev = "700fcc9b9aab8f5337d62cb8f18c894722cf02f4"
+git = "https://github.com/ggxchain/interbtc"
+rev = "fb0433e19d3f560b248f133c28ee0c0635e30ac0"
 package = "interbtc-primitives"
 
 [dependencies.module-bitcoin]
-git = "https://github.com/interlay/interbtc"
-rev = "700fcc9b9aab8f5337d62cb8f18c894722cf02f4"
+git = "https://github.com/ggxchain/interbtc"
+rev = "fb0433e19d3f560b248f133c28ee0c0635e30ac0"
 package = "bitcoin"
 features = ["parser"]
 

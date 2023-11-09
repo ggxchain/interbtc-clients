@@ -9,7 +9,7 @@ pub use metadata_aliases::*;
 pub use primitives::{
     CurrencyId,
     CurrencyId::{ForeignAsset, LendToken, Token},
-    TokenSymbol::{self, DOT, IBTC, INTR, KBTC, KINT, KSM},
+    TokenSymbol::{self, DOT, GGXT, IBTC, INTR, KBTC, KINT, KSM},
 };
 pub use sp_core::sr25519::Pair as KeyPair;
 pub use subxt;

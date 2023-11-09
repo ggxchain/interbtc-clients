@@ -329,6 +329,7 @@ dependencies = [
  "bech32",
  "bitcoin-private",
  "bitcoin_hashes 0.12.0",
+ "core2",
  "hex_lit",
  "secp256k1 0.27.0",
  "serde",
@@ -367,8 +368,9 @@ dependencies = [
 [[package]]
 name = "bitcoin"
 version = "1.2.0"
-source = "git+https://github.com/interlay/interbtc?rev=700fcc9b9aab8f5337d62cb8f18c894722cf02f4#700fcc9b9aab8f5337d62cb8f18c894722cf02f4"
+source = "git+https://github.com/ggxchain/interbtc?rev=fb0433e19d3f560b248f133c28ee0c0635e30ac0#fb0433e19d3f560b248f133c28ee0c0635e30ac0"
 dependencies = [
+ "bitcoin 0.30.1",
  "bitcoin_hashes 0.7.6",
  "hex",
  "impl-serde 0.3.2",
@@ -400,6 +402,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d7066118b13d4b20b23645932dfb3a81ce7e29f95726c2036fa33cd7b092501"
 dependencies = [
  "bitcoin-private",
+ "core2",
  "serde",
 ]
 
@@ -730,6 +733,15 @@ name = "core-foundation-sys"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e496a50fda8aacccc86d7529e2c1e0892dbd0f898a6b5645b5561b89c3210efa"
+
+[[package]]
+name = "core2"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "239fa3ae9b63c2dc74bd3fa852d4792b8b305ae64eeede946265b6af62f1fff3"
+dependencies = [
+ "memchr",
+]
 
 [[package]]
 name = "cpp_demangle"
@@ -2179,7 +2191,7 @@ dependencies = [
 [[package]]
 name = "interbtc-primitives"
 version = "1.2.0"
-source = "git+https://github.com/interlay/interbtc?rev=700fcc9b9aab8f5337d62cb8f18c894722cf02f4#700fcc9b9aab8f5337d62cb8f18c894722cf02f4"
+source = "git+https://github.com/ggxchain/interbtc?rev=fb0433e19d3f560b248f133c28ee0c0635e30ac0#fb0433e19d3f560b248f133c28ee0c0635e30ac0"
 dependencies = [
  "bitcoin 1.2.0",
  "bstringify",

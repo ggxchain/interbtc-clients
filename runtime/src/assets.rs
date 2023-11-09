@@ -148,6 +148,7 @@ impl TryFromSymbol for CurrencyId {
             id if id == KSM.symbol() => Ok(Token(KSM)),
             id if id == KBTC.symbol() => Ok(Token(KBTC)),
             id if id == KINT.symbol() => Ok(Token(KINT)),
+            id if id == GGXT.symbol() => Ok(Token(GGXT)),
             id if let Some(currency_id) = Self::from_lend_token_symbol(id) =>
                 Ok(currency_id),
             _ => AssetRegistry::get_foreign_asset_by_symbol(uppercase_symbol),
