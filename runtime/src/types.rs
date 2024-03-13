@@ -160,10 +160,8 @@ mod metadata_aliases {
     pub type VaultId = metadata::runtime_types::interbtc_primitives::VaultId<AccountId, CurrencyId>;
     pub type VaultCurrencyPair = metadata::runtime_types::interbtc_primitives::VaultCurrencyPair<CurrencyId>;
 
-    #[cfg(feature = "parachain-metadata-interlay")]
+    #[cfg(feature = "metadata-ggx-dev")]
     pub type EncodedCall = metadata::runtime_types::ggxchain_runtime_brooklyn::RuntimeCall;
-    #[cfg(feature = "parachain-metadata-kintsugi")]
-    pub type EncodedCall = metadata::runtime_types::kintsugi_runtime_parachain::RuntimeCall;
 
     pub use metadata::runtime_types::security::pallet::Call as SecurityCall;
 

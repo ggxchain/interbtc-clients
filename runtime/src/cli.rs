@@ -100,14 +100,7 @@ pub fn parse_duration_minutes(src: &str) -> Result<Duration, ParseIntError> {
 #[derive(Parser, Debug, Clone)]
 pub struct ConnectionOpts {
     /// Parachain websocket URL.
-    #[cfg_attr(
-        feature = "parachain-metadata-kintsugi",
-        clap(long, default_value = "ws://127.0.0.1:9944")
-    )]
-    #[cfg_attr(
-        feature = "parachain-metadata-interlay",
-        clap(long, default_value = "ws://127.0.0.1:9944")
-    )]
+    #[cfg_attr(feature = "metadata-ggx-dev", clap(long, default_value = "ws://127.0.0.1:9944"))]
     pub btc_parachain_url: String,
 
     /// Timeout in milliseconds to wait for connection to btc-parachain.

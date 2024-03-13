@@ -54,14 +54,12 @@ const TWOX_64_HASH_PREFIX_LENGTH: usize = 40;
 compile_error!("Tests are only supported for the kintsugi runtime");
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "parachain-metadata-interlay")] {
+    if #[cfg(feature = "metadata-ggx-dev")] {
         const DEFAULT_SPEC_VERSION: Range<u32> = 1..1026000;
         pub const DEFAULT_SPEC_NAME: &str = "ggxchain-node";
         pub const SS58_PREFIX: u16 = 42;
-    } else if #[cfg(feature = "parachain-metadata-kintsugi")] {
-        const DEFAULT_SPEC_VERSION: Range<u32> = 1025000..1026000;
-        pub const DEFAULT_SPEC_NAME: &str = "kintsugi-parachain";
-        pub const SS58_PREFIX: u16 = 2092;
+    } else {
+        compile_error!("No parachain metadata feature selected");
     }
 }
 

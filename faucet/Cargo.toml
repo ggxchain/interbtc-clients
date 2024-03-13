@@ -10,13 +10,14 @@ name = "shared"
 path = "src/lib.rs"
 
 [features]
-parachain-metadata-interlay = ["runtime/parachain-metadata-interlay"]
-parachain-metadata-kintsugi = ["runtime/parachain-metadata-kintsugi"]
+metadata-ggx-dev = ["runtime/metadata-ggx-dev"]
+# parachain-metadata-interlay = ["runtime/parachain-metadata-interlay"]
+# parachain-metadata-kintsugi = ["runtime/parachain-metadata-kintsugi"]
 
 [dependencies]
 log = "0.4.6"
 env_logger = "0.6.1"
-clap = { version = "4.0.17", features = ["derive"]}
+clap = { version = "4.0.17", features = ["derive"] }
 chrono = "0.4.22"
 tokio = { version = "1.0", features = ["full"] }
 thiserror = "1.0"
