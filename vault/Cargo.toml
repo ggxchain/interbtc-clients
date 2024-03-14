@@ -71,3 +71,5 @@ bitcoin = { path = "../bitcoin", features = ["cli", "regtest-manual-mining"] }
 
 # Substrate dependencies
 frame-support = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.43" }
+
+testutil = { path = "../testutil" }

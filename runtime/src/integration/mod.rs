@@ -1,7 +1,6 @@
 #![cfg(feature = "testing-utils")]
 
 mod bitcoin_simulator;
-
 use crate::{
     rpc::{IssuePallet, OraclePallet, SudoPallet, VaultRegistryPallet},
     CurrencyId, FixedU128, InterBtcParachain, InterBtcSigner, OracleKey, PartialAddress, VaultId,
@@ -13,11 +12,7 @@ use futures::{
     pin_mut, Future, FutureExt, SinkExt, StreamExt,
 };
 use sp_keyring::AccountKeyring;
-use std::{
-    process::{Child, Command},
-    sync::Arc,
-    time::Duration,
-};
+use std::{sync::Arc, time::Duration};
 use subxt::events::StaticEvent as Event;
 use tempdir::TempDir;
 use tokio::time::{sleep, timeout};
@@ -27,12 +22,20 @@ type DynBitcoinCoreApi = Arc<dyn BitcoinCoreApi + Send + Sync>;
 // export the mocked bitcoin interface
 pub use bitcoin_simulator::MockBitcoinCore;
 
+use testutil::{
+    ggx::{GgxNodeContainer, GgxNodeImage},
+    Cli,
+};
+
 /// Start a new instance of the parachain. The second item in the returned tuple must remain in
 /// scope as long as the parachain is active, since dropping it will remove the temporary directory
 /// that the parachain uses
-pub async fn default_root_provider(key: AccountKeyring) -> (InterBtcParachain, TempDir) {
+pub async fn default_root_provider<'d>(
+    key: AccountKeyring,
+    node: &GgxNodeContainer<'d>,
+) -> (InterBtcParachain, TempDir) {
     let tmp = TempDir::new("btc-parachain-").expect("failed to create tempdir");
-    let root_provider = setup_provider(key).await;
+    let root_provider = setup_provider(key, &node).await;
 
     try_join(
         root_provider.set_bitcoin_confirmations(1),
@@ -45,11 +48,13 @@ pub async fn default_root_provider(key: AccountKeyring) -> (InterBtcParachain, T
 }
 
 /// Create a new parachain_rpc with the given keyring
-pub async fn setup_provider(key: AccountKeyring) -> InterBtcParachain {
+pub async fn setup_provider<'d>(key: AccountKeyring, node: &GgxNodeContainer<'d>) -> InterBtcParachain {
     let signer = InterBtcSigner::new(key.pair());
     let shutdown_tx = crate::ShutdownSender::new();
+    let host = node.get_host();
+    let port = node.get_rpc_port();
     let parachain_rpc = InterBtcParachain::from_url_with_retry(
-        &"ws://127.0.0.1:9944".to_string(),
+        &format!("ws://{host}:{port}").to_string(),
         signer.clone(),
         Duration::from_secs(20),
         shutdown_tx,
@@ -172,18 +177,9 @@ pub async fn with_timeout<T: Future>(future: T, duration: Duration) -> T::Output
     timeout(duration, future).await.expect("timeout")
 }
 
-pub async fn start_chain() -> std::io::Result<Child> {
-    let _stop_previous_instance = Command::new("docker")
-        .arg("compose")
-        .arg("rm")
-        .arg("-v")
-        .arg("-s")
-        .arg("-f")
-        .arg("interbtc")
-        .status()
-        .unwrap();
-    let command = Command::new("sh").arg("../scripts/run_parachain_node.sh").spawn();
-    command
+pub fn start_chain<'d>(docker: &'d Cli) -> GgxNodeContainer<'d> {
+    let image = GgxNodeImage::default();
+    GgxNodeContainer::<'d>(docker.run(image))
 }
 
 pub async fn periodically_produce_blocks(parachain_rpc: InterBtcParachain) {

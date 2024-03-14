@@ -55,6 +55,8 @@ jsonrpsee = { version = "0.16", features = [
 
 bitcoin = { path = "../bitcoin" }
 
+testutil = { path = "../testutil" }
+
 # Dependencies for the testing utils for integration tests
 tempdir = { version = "0.3.7", optional = true }
 rand = { version = "0.7", optional = true }

@@ -10,9 +10,8 @@ name = "shared"
 path = "src/lib.rs"
 
 [features]
+defaukt = ["metadata-ggx-dev"]
 metadata-ggx-dev = ["runtime/metadata-ggx-dev"]
-# parachain-metadata-interlay = ["runtime/parachain-metadata-interlay"]
-# parachain-metadata-kintsugi = ["runtime/parachain-metadata-kintsugi"]
 
 [dependencies]
 log = "0.4.6"
@@ -47,3 +46,5 @@ runtime = { path = "../runtime", features = ["testing-utils"] }
 
 # Substrate dependencies
 sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.43" }
+
+testutil = { path = "../testutil" }

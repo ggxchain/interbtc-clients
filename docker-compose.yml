@@ -1,13 +1,15 @@
 version: "3.8"
 services:
     interbtc:
-        image: "interlayhq/interbtc:1.25.1"
+        image: "public.ecr.aws/k7w7q6c4/ggxchain-node:brooklyn-9cf57e91"
+        entrypoint:
+            - /usr/src/app/target/release/ggxchain-node
         command:
             - --rpc-external
-            - --ws-external
+            # - --ws-external
             - --rpc-methods=unsafe
             - --dev
-            - --instant-seal
+            # - --instant-seal
         ports:
             - "9933:9933"
             - "9944:9944"
@@ -25,6 +27,8 @@ services:
             - "18443:18443"
     bitcoin-cli:
         image: "ruimarinho/bitcoin-core:22"
+        depends_on:
+            - bitcoind
         command:
             - /bin/sh
             - -c
@@ -35,6 +39,8 @@ services:
                 bitcoin-cli -regtest -rpcconnect=bitcoind -rpcwait -rpcuser=rpcuser -rpcpassword=rpcpassword generatetoaddress 101 $${ALICE_ADDRESS}
     electrs:
         image: "interlayhq/electrs:latest"
+        depends_on:
+            - bitcoind
         command:
             - electrs
             - -vvvv
@@ -52,4 +58,3 @@ services:
             - --index-unspendables
         ports:
             - "3002:3002"
-        restart: always

@@ -1,22 +1,26 @@
-#![cfg(feature = "uses-bitcoind")]
-
 use bitcoin::{Auth, BitcoinCore, BitcoinCoreApi, BitcoinCoreBuilder, Error, Network, PrivateKey, PublicKey};
 use regex::Regex;
-use std::env::var;
+use testutil::{
+    btc::{BtcNodeContainer, BtcNodeImage},
+    Cli,
+};
 
-fn new_bitcoin_core(wallet: Option<String>) -> Result<BitcoinCore, Error> {
-    BitcoinCoreBuilder::new(var("BITCOIN_RPC_URL").expect("BITCOIN_RPC_URL not set"))
-        .set_auth(Auth::UserPass(
-            var("BITCOIN_RPC_USER").expect("BITCOIN_RPC_USER not set"),
-            var("BITCOIN_RPC_PASS").expect("BITCOIN_RPC_PASS not set"),
-        ))
+fn new_bitcoin_core(docker: &Cli, wallet: Option<String>) -> Result<(BitcoinCore, BtcNodeContainer<'_>), Error> {
+    let container = BtcNodeContainer(docker.run(BtcNodeImage::default()));
+
+    let api = BitcoinCoreBuilder::new(container.get_rpc_url())
+        .set_auth(Auth::UserPass(container.get_username(), container.get_password()))
         .set_wallet_name(wallet)
         .build_with_network(Network::Regtest)
+        .unwrap();
+
+    Ok((api, container))
 }
 
 #[tokio::test]
 async fn should_get_new_address() -> Result<(), Error> {
-    let btc_rpc = new_bitcoin_core(Some("Alice".to_string()))?;
+    let docker = Cli::default();
+    let (btc_rpc, _container) = new_bitcoin_core(&docker, Some("Alice".to_string()))?;
     btc_rpc.create_or_load_wallet().await?;
 
     let re = Regex::new("^(bcrt1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$").unwrap();
@@ -27,8 +31,10 @@ async fn should_get_new_address() -> Result<(), Error> {
 }
 
 #[tokio::test]
+
 async fn should_get_new_public_key() -> Result<(), Error> {
-    let btc_rpc = new_bitcoin_core(Some("Bob".to_string()))?;
+    let docker = Cli::default();
+    let (btc_rpc, _container) = new_bitcoin_core(&docker, Some("Bob".to_string()))?;
     btc_rpc.create_or_load_wallet().await?;
 
     let public_key = btc_rpc.get_new_public_key().await?;
@@ -38,8 +44,10 @@ async fn should_get_new_public_key() -> Result<(), Error> {
 }
 
 #[tokio::test]
+
 async fn should_add_new_deposit_key() -> Result<(), Error> {
-    let btc_rpc = new_bitcoin_core(Some("Charlie".to_string()))?;
+    let docker = Cli::default();
+    let (btc_rpc, _container) = new_bitcoin_core(&docker, Some("Charlie".to_string()))?;
     btc_rpc.create_or_load_wallet().await?;
 
     btc_rpc

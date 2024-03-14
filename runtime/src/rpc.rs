@@ -56,7 +56,7 @@ compile_error!("Tests are only supported for the ggx-dev runtime");
 cfg_if::cfg_if! {
     if #[cfg(feature = "metadata-ggx-dev")] {
         const DEFAULT_SPEC_VERSION: Range<u32> = 1..1026000;
-        pub const DEFAULT_SPEC_NAME: &str = "kintsugi-parachain"; // TODO(Bohdan): fix this when interbtc parachain is changed with ggx
+        pub const DEFAULT_SPEC_NAME: &str = "ggxchain-node";
         pub const SS58_PREFIX: u16 = 42;
     } else {
         compile_error!("No parachain metadata feature selected");
@@ -274,11 +274,7 @@ impl InterBtcParachain {
                         .submit_and_watch()
                         .await?;
 
-                    if cfg!(feature = "testing-utils") {
-                        tx_progress.wait_for_in_block().await?.wait_for_success().await
-                    } else {
-                        tx_progress.wait_for_finalized_success().await
-                    }
+                    tx_progress.wait_for_finalized_success().await
                 })
                 .await
                 {

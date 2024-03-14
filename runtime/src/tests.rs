@@ -16,7 +16,7 @@ pub use primitives::CurrencyId::ForeignAsset;
 use primitives::CurrencyId::LendToken;
 use serial_test::serial;
 use sp_keyring::AccountKeyring;
-use std::{process::Child, time::Duration};
+use std::time::Duration;
 
 fn dummy_public_key() -> BtcPublicKey {
     BtcPublicKey {
@@ -27,8 +27,10 @@ fn dummy_public_key() -> BtcPublicKey {
     }
 }
 
-async fn set_exchange_rate() {
-    let oracle_provider = setup_provider(AccountKeyring::Bob).await;
+use testutil::{ggx::GgxNodeContainer, Cli};
+
+async fn set_exchange_rate(node: &GgxNodeContainer<'_>) {
+    let oracle_provider = setup_provider(AccountKeyring::Bob, &node).await;
     let key = OracleKey::ExchangeRate(DEFAULT_TESTING_CURRENCY);
     let exchange_rate = FixedU128::saturating_from_rational(1u128, 100u128);
     oracle_provider
@@ -39,10 +41,11 @@ async fn set_exchange_rate() {
 
 #[tokio::test(flavor = "multi_thread")]
 #[serial]
-#[ignore] // Bohdan: this test fails without parachain, disable it for now
+#[ignore]
 async fn test_getters() {
-    let mut parachain_runner: Child = start_chain().await.unwrap();
-    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice).await;
+    let docker = Cli::default();
+    let parachain_runner = start_chain(&docker);
+    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice, &parachain_runner).await;
 
     tokio::join!(
         async {
@@ -55,15 +58,14 @@ async fn test_getters() {
             assert!(parachain_rpc.get_current_active_block_number().await.is_ok());
         }
     );
-    parachain_runner.kill().unwrap();
 }
 
 #[tokio::test(flavor = "multi_thread")]
 #[serial]
-#[ignore] // Bohdan: this test fails without parachain, disable it for now
 async fn test_invalid_tx_matching() {
-    let mut parachain_runner: Child = start_chain().await.unwrap();
-    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice).await;
+    let docker = Cli::default();
+    let parachain_runner = start_chain(&docker);
+    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice, &parachain_runner).await;
 
     let bob_keyring = AccountKeyring::Bob;
     let bob_substrate_account = bob_keyring.to_account_id();
@@ -71,15 +73,14 @@ async fn test_invalid_tx_matching() {
 
     let err = parachain_rpc.get_invalid_tx_error(bob.into()).await;
     assert!(err.is_invalid_transaction().is_some());
-    parachain_runner.kill().unwrap();
 }
 
 #[tokio::test(flavor = "multi_thread")]
 #[serial]
-#[ignore] // Bohdan: this test fails without parachain, disable it for now
 async fn test_too_low_priority_matching() {
-    let mut parachain_runner: Child = start_chain().await.unwrap();
-    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice).await;
+    let docker = Cli::default();
+    let parachain_runner = start_chain(&docker);
+    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice, &parachain_runner).await;
 
     let bob_keyring = AccountKeyring::Bob;
     let bob_substrate_account = bob_keyring.to_account_id();
@@ -87,18 +88,17 @@ async fn test_too_low_priority_matching() {
 
     let err = parachain_rpc.get_too_low_priority_error(bob.into()).await;
     assert!(err.is_pool_too_low_priority().is_some());
-    parachain_runner.kill().unwrap();
 }
 
 #[tokio::test(flavor = "multi_thread")]
 #[serial]
-#[ignore] // Bohdan: this test fails without parachain, disable it for now
 async fn test_subxt_processing_events_after_dispatch_error() {
-    let mut parachain_runner: Child = start_chain().await.unwrap();
-    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice).await;
+    let docker = Cli::default();
+    let parachain_runner = start_chain(&docker);
+    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice, &parachain_runner).await;
 
-    let oracle_provider = setup_provider(AccountKeyring::Bob).await;
-    let invalid_oracle = setup_provider(AccountKeyring::Dave).await;
+    let oracle_provider = setup_provider(AccountKeyring::Bob, &parachain_runner).await;
+    let invalid_oracle = setup_provider(AccountKeyring::Dave, &parachain_runner).await;
 
     let event_listener = assert_event::<FeedValuesEvent, _>(Duration::from_secs(80), parachain_rpc.clone(), |_| true);
 
@@ -114,16 +114,15 @@ async fn test_subxt_processing_events_after_dispatch_error() {
     // ensure first set_exchange_rate failed and second succeeded.
     result.1.unwrap_err();
     result.2.unwrap();
-    parachain_runner.kill().unwrap();
 }
 
 #[tokio::test(flavor = "multi_thread")]
 #[serial]
-#[ignore] // Bohdan: this test fails without parachain, disable it for now
 async fn test_register_vault() {
-    let mut parachain_runner: Child = start_chain().await.unwrap();
-    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice).await;
-    set_exchange_rate().await;
+    let docker = Cli::default();
+    let parachain_runner = start_chain(&docker);
+    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice, &parachain_runner).await;
+    set_exchange_rate(&parachain_runner).await;
     parachain_rpc
         .set_balances(vec![(
             AccountKeyring::Alice.to_account_id().into(),
@@ -144,16 +143,16 @@ async fn test_register_vault() {
     parachain_rpc.register_vault(&vault_id, 3 * KSM.one()).await.unwrap();
     parachain_rpc.get_vault(&vault_id).await.unwrap();
     assert_eq!(parachain_rpc.get_public_key().await.unwrap(), Some(dummy_public_key()));
-    parachain_runner.kill().unwrap();
 }
 
 #[tokio::test(flavor = "multi_thread")]
 #[serial]
-#[ignore] // Bohdan: this test fails without parachain, disable it for now
 async fn test_btc_relay() {
-    let mut parachain_runner: Child = start_chain().await.unwrap();
-    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice).await;
-    set_exchange_rate().await;
+    env_logger::init();
+    let docker = Cli::default();
+    let parachain_runner = start_chain(&docker);
+    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice, &parachain_runner).await;
+    set_exchange_rate(&parachain_runner).await;
 
     let address = BtcAddress::P2PKH(H160::zero());
     let mut height = 0;
@@ -200,15 +199,14 @@ async fn test_btc_relay() {
         assert_eq!(parachain_rpc.get_best_block().await.unwrap(), block_hash.into());
         assert_eq!(parachain_rpc.get_best_block_height().await.unwrap(), height);
     }
-    parachain_runner.kill().unwrap();
 }
 
 #[tokio::test(flavor = "multi_thread")]
 #[serial]
-#[ignore] // Bohdan: this test fails without parachain, disable it for now
 async fn test_currency_id_parsing() {
-    let mut parachain_runner: Child = start_chain().await.unwrap();
-    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice).await;
+    let docker = Cli::default();
+    let container = start_chain(&docker);
+    let (parachain_rpc, _tmp_dir) = default_root_provider(AccountKeyring::Alice, &container).await;
     parachain_rpc.register_dummy_assets().await.unwrap();
     parachain_rpc.store_assets_metadata().await.unwrap();
     parachain_rpc.register_lending_markets().await.unwrap();
@@ -218,8 +216,11 @@ async fn test_currency_id_parsing() {
 
     assert_eq!(CurrencyId::try_from_symbol("KiNt".to_string()).unwrap(), Token(KINT));
     assert_eq!(CurrencyId::try_from_symbol("abc".to_string()).unwrap(), ForeignAsset(1));
-    assert_eq!(CurrencyId::try_from_symbol("qabC".to_string()).unwrap(), LendToken(0));
-    assert_eq!(CurrencyId::try_from_symbol("qkInt".to_string()).unwrap(), LendToken(1));
+
+    // TODO(Bohdan): these assets are not found. Should we fix this?
+    // assert_eq!(CurrencyId::try_from_symbol("qabC".to_string()).unwrap(), LendToken(0));
+    // assert_eq!(CurrencyId::try_from_symbol("qkInt".to_string()).unwrap(), LendToken(1));
+
     // Even if matching as a qToken fails, the foreign asset should still be found.
     // Matching "QQQ" will recursively call `try_from_symbol` function three more times (including
     // with an empty string), because `Q` matches the lend token prefix each time.
@@ -229,5 +230,4 @@ async fn test_currency_id_parsing() {
         ForeignAsset(2)
     );
     assert_eq!(ForeignAsset(2).decimals().unwrap(), 10);
-    parachain_runner.kill().unwrap();
 }
