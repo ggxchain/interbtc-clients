@@ -50,13 +50,13 @@ const BLAKE2_128_HASH_PREFIX_LENGTH: usize = 48;
 const TWOX_64_HASH_PREFIX_LENGTH: usize = 40;
 
 // sanity check to be sure that testing-utils is not accidentally selected
-#[cfg(all(any(test, feature = "testing-utils"), not(feature = "parachain-metadata-kintsugi")))]
-compile_error!("Tests are only supported for the kintsugi runtime");
+#[cfg(all(any(test, feature = "testing-utils"), not(feature = "metadata-ggx-dev")))]
+compile_error!("Tests are only supported for the ggx-dev runtime");
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "metadata-ggx-dev")] {
         const DEFAULT_SPEC_VERSION: Range<u32> = 1..1026000;
-        pub const DEFAULT_SPEC_NAME: &str = "ggxchain-node";
+        pub const DEFAULT_SPEC_NAME: &str = "kintsugi-parachain"; // TODO(Bohdan): fix this when interbtc parachain is changed with ggx
         pub const SS58_PREFIX: u16 = 42;
     } else {
         compile_error!("No parachain metadata feature selected");
@@ -472,7 +472,9 @@ impl InterBtcParachain {
     /// Emulate the POOL_INVALID_TX error using token transfer extrinsics.
     #[cfg(test)]
     pub async fn get_invalid_tx_error(&self, recipient: AccountId) -> Error {
-        let call = metadata::tx().tokens().transfer(recipient, Token(DOT), 100);
+        let call = metadata::tx()
+            .tokens()
+            .transfer(subxt::utils::MultiAddress::Id(recipient), Token(DOT), 100);
         let nonce = self.get_fresh_nonce().await.unwrap();
 
         self.api
@@ -497,7 +499,9 @@ impl InterBtcParachain {
     /// Emulate the POOL_TOO_LOW_PRIORITY error using token transfer extrinsics.
     #[cfg(test)]
     pub async fn get_too_low_priority_error(&self, recipient: AccountId) -> Error {
-        let call = metadata::tx().tokens().transfer(recipient, Token(DOT), 100);
+        let call = metadata::tx()
+            .tokens()
+            .transfer(subxt::utils::MultiAddress::Id(recipient), Token(DOT), 100);
 
         let nonce = self.get_fresh_nonce().await.unwrap();
 

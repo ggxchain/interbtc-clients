@@ -19,7 +19,7 @@ use signal_hook_tokio::Signals;
 use std::{path::PathBuf, time::Duration};
 use tokio::{join, time::sleep};
 
-const VERSION: &str = git_version!(args = ["--tags"]);
+const VERSION: &str = git_version!(args = ["--tags"], fallback = "unknown");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 const NAME: &str = env!("CARGO_PKG_NAME");
 const ABOUT: &str = env!("CARGO_PKG_DESCRIPTION");

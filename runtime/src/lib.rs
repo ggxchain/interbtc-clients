@@ -125,7 +125,7 @@ impl Config for InterBtcRuntime {
     type Index = <SubstrateConfig as Config>::Index;
     type Hash = <SubstrateConfig as Config>::Hash;
     type AccountId = AccountId;
-    type Address = sp_runtime::MultiAddress<Self::AccountId, u32>;
+    type Address = Self::AccountId;
     type Signature = MultiSignature;
     type Hasher = <SubstrateConfig as Config>::Hasher;
     type Header = <SubstrateConfig as Config>::Header;
