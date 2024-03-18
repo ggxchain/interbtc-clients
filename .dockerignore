@@ -1,0 +1,3 @@
+# ignore prebuilt files in COPY clause in Dockerfiles
+target
+Dockerfile

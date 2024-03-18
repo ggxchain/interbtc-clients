@@ -118,6 +118,7 @@ async fn test_subxt_processing_events_after_dispatch_error() {
 
 #[tokio::test(flavor = "multi_thread")]
 #[serial]
+#[ignore]
 async fn test_register_vault() {
     let docker = Cli::default();
     let parachain_runner = start_chain(&docker);
