@@ -777,18 +777,17 @@ impl UtilFuncs for InterBtcParachain {
     }
 
     async fn get_lend_tokens(&self) -> Result<Vec<(CurrencyId, CurrencyId)>, Error> {
-        // let key_addr = metadata::storage().loans().markets_root();
-        // let markets = self
-        //     .get_decoded_storage_keys::<_, CurrencyId>(key_addr, StorageMapHasher::Blake2_128)
-        //     .await?;
-        // let ret = markets
-        //     .into_iter()
-        //     .map(|(underlying_currency_id, market)| {
-        //         let lend_token_id = market.lend_token_id;
-        //         (underlying_currency_id, lend_token_id)
-        //     })
-        //     .collect();
-        let ret = vec![];
+        let key_addr = metadata::storage().loans().markets_root();
+        let markets = self
+            .get_decoded_storage_keys::<_, CurrencyId>(key_addr, StorageMapHasher::Blake2_128)
+            .await?;
+        let ret = markets
+            .into_iter()
+            .map(|(underlying_currency_id, market)| {
+                let lend_token_id = market.lend_token_id;
+                (underlying_currency_id, lend_token_id)
+            })
+            .collect();
         Ok(ret)
     }
 
