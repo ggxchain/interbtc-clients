@@ -14,3 +14,4 @@ kv
 *.wif
 .idea/*
 *.db
+/run.sh

@@ -57,7 +57,7 @@ cfg_if::cfg_if! {
     if #[cfg(feature = "metadata-ggx-dev")] {
         const DEFAULT_SPEC_VERSION: Range<u32> = 1..1026000;
         pub const DEFAULT_SPEC_NAME: &str = "ggxchain-node";
-        pub const SS58_PREFIX: u16 = 42;
+        pub const SS58_PREFIX: u16 = 8886; // should be this one for both dev/brooklyn...
     } else {
         compile_error!("No parachain metadata feature selected");
     }
@@ -634,33 +634,33 @@ impl InterBtcParachain {
 
     /// Cache new markets and updates
     pub async fn listen_for_lending_markets(&self) -> Result<(), Error> {
-        // futures::future::try_join(
-        //     self.on_event::<NewMarketEvent, _, _, _>(
-        //         |event| async move {
-        //             if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id)
-        // {                 log::error!(
-        //                     "Failed to register lend token {:?}: {}",
-        //                     event.underlying_currency_id,
-        //                     err
-        //                 );
-        //             }
-        //         },
-        //         |_| {},
-        //     ),
-        //     self.on_event::<UpdatedMarketEvent, _, _, _>(
-        //         |event| async move {
-        //             if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id)
-        // {                 log::error!(
-        //                     "Failed to update lend token {:?}: {}",
-        //                     event.underlying_currency_id,
-        //                     err
-        //                 );
-        //             }
-        //         },
-        //         |_| {},
-        //     ),
-        // )
-        // .await?;
+        futures::future::try_join(
+            self.on_event::<NewMarketEvent, _, _, _>(
+                |event| async move {
+                    if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id) {
+                        log::error!(
+                            "Failed to register lend token {:?}: {}",
+                            event.underlying_currency_id,
+                            err
+                        );
+                    }
+                },
+                |_| {},
+            ),
+            self.on_event::<UpdatedMarketEvent, _, _, _>(
+                |event| async move {
+                    if let Err(err) = LendingAssets::insert(event.underlying_currency_id, event.market.lend_token_id) {
+                        log::error!(
+                            "Failed to update lend token {:?}: {}",
+                            event.underlying_currency_id,
+                            err
+                        );
+                    }
+                },
+                |_| {},
+            ),
+        )
+        .await?;
         Ok(())
     }
 

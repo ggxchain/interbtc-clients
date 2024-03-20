@@ -59,7 +59,7 @@ pub const DISABLE_DIFFICULTY_CHECK: &str = "DisableDifficultyCheck";
 #[cfg_attr(
     feature = "metadata-ggx-dev",
     subxt(
-        runtime_metadata_path = "metadata-ggx-dev.scale",
+        runtime_metadata_path = "metadata-ggx-dev-brooklyn.scale",
         derive_for_all_types = "Clone",
         derive_for_type(path = "bitcoin::address::PublicKey", derive = "Eq, PartialEq"),
         derive_for_type(path = "bitcoin::types::H256Le", derive = "Eq, PartialEq"),

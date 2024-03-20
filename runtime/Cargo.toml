@@ -63,12 +63,12 @@ rand = { version = "0.7", optional = true }
 
 [dependencies.primitives]
 git = "https://github.com/ggxchain/interbtc"
-rev = "fb0433e19d3f560b248f133c28ee0c0635e30ac0"
+rev = "c4d97d3c986f119b3c888d0dff946b74cee08e62"
 package = "interbtc-primitives"
 
 [dependencies.module-bitcoin]
 git = "https://github.com/ggxchain/interbtc"
-rev = "fb0433e19d3f560b248f133c28ee0c0635e30ac0"
+rev = "c4d97d3c986f119b3c888d0dff946b74cee08e62"
 package = "bitcoin"
 features = ["parser"]
 

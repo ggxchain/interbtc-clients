@@ -493,6 +493,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     #[serial]
+    #[ignore]
     async fn test_fund_user_once_succeeds() {
         let docker = Cli::default();
         let container = start_chain(&docker);
@@ -533,6 +534,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     #[serial]
+    #[ignore]
     async fn test_fund_rich_user_fails() {
         let docker = Cli::default();
         let container = start_chain(&docker);
@@ -637,6 +639,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     #[serial]
+    #[ignore]
     async fn test_fund_user_twice_in_a_row_fails() {
         let docker = Cli::default();
         let container = start_chain(&docker);

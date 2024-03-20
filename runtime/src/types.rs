@@ -93,7 +93,7 @@ mod metadata_aliases {
         oracle::events::FeedValues as FeedValuesEvent,
     };
 
-    //pub use metadata::loans::events::{NewMarket as NewMarketEvent, UpdatedMarket as UpdatedMarketEvent};
+    pub use metadata::loans::events::{NewMarket as NewMarketEvent, UpdatedMarket as UpdatedMarketEvent};
 
     pub use metadata::issue::events::{
         CancelIssue as CancelIssueEvent, ExecuteIssue as ExecuteIssueEvent, RequestIssue as RequestIssueEvent,

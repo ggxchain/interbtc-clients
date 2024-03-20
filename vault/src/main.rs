@@ -2,7 +2,7 @@ use bitcoin::{Network, PrivateKey};
 use clap::Parser;
 use futures::Future;
 use runtime::{
-    sp_core::crypto::{Pair, Ss58Codec},
+    sp_core::crypto::{set_default_ss58_version, Pair, Ss58AddressFormat, Ss58Codec},
     InterBtcSigner, KeyPair, DEFAULT_SPEC_NAME, SS58_PREFIX,
 };
 use secp256k1::{rand::thread_rng, SecretKey};
@@ -163,6 +163,9 @@ async fn start() -> Result<(), Error> {
         }
         _ => (),
     }
+
+    let format = Ss58AddressFormat::custom(SS58_PREFIX);
+    set_default_ss58_version(format);
 
     let (pair, wallet_name) = opts.account_info.get_key_pair()?;
     let signer = InterBtcSigner::new(pair);
