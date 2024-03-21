@@ -26,7 +26,7 @@ const DEFAULT_NATIVE_CURRENCY: CurrencyId = Token(KINT);
 const DEFAULT_TESTING_CURRENCY: CurrencyId = Token(KSM);
 const DEFAULT_WRAPPED_CURRENCY: CurrencyId = Token(KBTC);
 
-use testutil::{ggx::GgxNodeContainer, Cli};
+use testutil::{containers::ggx::GgxNodeContainer, Cli};
 
 async fn test_with_vault<'d, F, R>(
     docker: &'d Cli,

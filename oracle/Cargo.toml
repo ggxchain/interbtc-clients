@@ -6,7 +6,9 @@ edition = "2018"
 description = "Liveness service to update the exchange rate periodically."
 
 [features]
-metadata-ggx-dev = ["runtime/metadata-ggx-dev"]
+default = []
+brooklyn = ["runtime/brooklyn"]
+sydney = ["runtime/sydney"]
 
 [dependencies]
 log = "0.4.0"

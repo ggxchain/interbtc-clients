@@ -132,7 +132,7 @@ pub fn pid_name_matches_existing_client(sys: &mut impl SystemProcess, pidfile_va
     Ok(sys.process_name(client_pid)? == sys.process_name(pidfile_value)?)
 }
 
-#[cfg(all(test, feature = "parachain-metadata-kintsugi"))]
+#[cfg(all(test, feature = "brooklyn"))]
 mod tests {
     use super::*;
     use serial_test::serial;

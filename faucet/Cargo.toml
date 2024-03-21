@@ -10,8 +10,9 @@ name = "shared"
 path = "src/lib.rs"
 
 [features]
-defaukt = ["metadata-ggx-dev"]
-metadata-ggx-dev = ["runtime/metadata-ggx-dev"]
+default = []
+brooklyn = ["runtime/brooklyn", "testutil/brooklyn"]
+sydney = ["runtime/sydney", "testutil/sydney"]
 
 [dependencies]
 log = "0.4.6"
@@ -47,4 +48,4 @@ runtime = { path = "../runtime", features = ["testing-utils"] }
 # Substrate dependencies
 sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.43" }
 
-testutil = { path = "../testutil" }
+testutil = { git = "https://github.com/ggxchain/testutil/", rev = "32601b997b20bfad6aee998487054e6115d8954c" }

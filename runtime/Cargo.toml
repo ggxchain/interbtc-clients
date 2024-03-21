@@ -5,9 +5,10 @@ authors = ["Interlay <contact@interlay.io>"]
 edition = "2018"
 
 [features]
-default = ["metadata-ggx-dev"]
+default = []
+brooklyn = ["testutil/brooklyn", "testutil/brooklyn"]
+sydney = ["testutil/sydney", "testutil/sydney"]
 testing-utils = ["tempdir", "rand"]
-metadata-ggx-dev = []
 
 [dependencies]
 serde = { version = "1.0.136", features = ["derive"] }
@@ -22,7 +23,7 @@ tokio = { version = "1.0", features = ["full"] }
 backoff = { version = "0.3.0", features = ["tokio"] }
 futures = "0.3.5"
 clap = { version = "4.0.17", features = ["derive"] }
-log = "0.4.0"
+log = "^0.4"
 url = "2"
 cfg-if = "1.0"
 prometheus = { version = "0.12.0", features = ["process"] }
@@ -55,8 +56,6 @@ jsonrpsee = { version = "0.16", features = [
 
 bitcoin = { path = "../bitcoin" }
 
-testutil = { path = "../testutil" }
-
 # Dependencies for the testing utils for integration tests
 tempdir = { version = "0.3.7", optional = true }
 rand = { version = "0.7", optional = true }
@@ -72,8 +71,13 @@ rev = "c4d97d3c986f119b3c888d0dff946b74cee08e62"
 package = "bitcoin"
 features = ["parser"]
 
+
 [dev-dependencies]
 runtime = { path = ".", features = ["testing-utils"] }
 tempdir = "0.3.7"
 env_logger = "0.8.3"
 serial_test = "0.9.0"
+
+[dependencies.testutil]
+git = "https://github.com/ggxchain/testutil"
+rev = "bd742c6c43cf49b96d18c2fe507cfd8622010fce"

@@ -40,7 +40,7 @@ The basic command to run the vault client:
 
 ```
 source ../.env
-cargo run --bin vault --features parachain-metadata-kintsugi
+cargo run --bin vault --features brooklyn
 ```
 
 ### Examples
@@ -66,10 +66,10 @@ vault \
 When using cargo to run this binary, arguments to cargo and the binary are separated by `--`. For example, to pass `--help` to the vault to get a list of all command line options that is guaranteed to be up date, run:
 
 ```
-cargo run --bin vault --features parachain-metadata-kintsugi -- --help
+cargo run --bin vault --features brooklyn -- --help
 ```
 
-For convenience, a copy of this output is included below. Note that the bitcoin RPC configuration can be passed either as command line arguments, or as environment variables. By running `source ../.env`, the default RPC configuration is loaded into environment variables. 
+For convenience, a copy of this output is included below. Note that the bitcoin RPC configuration can be passed either as command line arguments, or as environment variables. By running `source ../.env`, the default RPC configuration is loaded into environment variables.
 
 ```
 USAGE:
@@ -86,17 +86,17 @@ OPTIONS:
 
         --bitcoin-connection-timeout-ms <BITCOIN_CONNECTION_TIMEOUT_MS>
             Timeout in milliseconds to wait for connection to bitcoin-core
-            
+
             [default: 60000]
 
         --bitcoin-poll-interval-ms <BITCOIN_POLL_INTERVAL_MS>
             Timeout in milliseconds to poll Bitcoin
-            
+
             [default: 6000]
 
         --bitcoin-relay-confirmations <BITCOIN_RELAY_CONFIRMATIONS>
             Number of confirmations a block needs to have before it is submitted
-            
+
             [default: 0]
 
         --bitcoin-relay-start-height <BITCOIN_RELAY_START_HEIGHT>
@@ -121,17 +121,17 @@ OPTIONS:
 
         --btc-parachain-connection-timeout-ms <BTC_PARACHAIN_CONNECTION_TIMEOUT_MS>
             Timeout in milliseconds to wait for connection to btc-parachain
-            
+
             [default: 60000]
 
         --btc-parachain-url <BTC_PARACHAIN_URL>
             Parachain websocket URL
-            
+
             [default: wss://api-dev-kintsugi.interlay.io:443/parachain]
 
         --collateral-timeout-ms <COLLATERAL_TIMEOUT_MS>
             Timeout in milliseconds to repeat collateralization checks
-            
+
             [default: 5000]
 
         --electrs-url <ELECTRS_URL>
@@ -159,12 +159,12 @@ OPTIONS:
 
         --logging-format <LOGGING_FORMAT>
             Logging output format
-            
+
             [default: full]
 
         --max-batch-size <MAX_BATCH_SIZE>
             Max batch size for combined block header submission
-            
+
             [default: 16]
 
         --max-concurrent-requests <MAX_CONCURRENT_REQUESTS>
@@ -197,22 +197,22 @@ OPTIONS:
 
         --payment-margin-minutes <PAYMENT_MARGIN_MINUTES>
             Minimum time to the the redeem/replace execution deadline to make the bitcoin payment
-            
+
             [default: 120]
 
         --prometheus-external
             Expose Prometheus exporter on all interfaces.
-            
+
             Default is local.
 
         --prometheus-port <PROMETHEUS_PORT>
             Specify Prometheus exporter TCP Port
-            
+
             [default: 9615]
 
         --restart-policy <RESTART_POLICY>
             Restart or stop on error
-            
+
             [default: always]
 
     -V, --version

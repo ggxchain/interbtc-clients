@@ -68,11 +68,11 @@ curl -sX POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","meth
 
 To build, one of the following mutually-exclusive features must be specified:
 - parachain-metadata-interlay
-- parachain-metadata-kintsugi
+- brooklyn
 
 The default command for building the clients, assuming a Kintsugi chain, is:
 ```shell
-cargo run --features=parachain-metadata-kintsugi --bin runner -- --parachain-ws 'ws://localhost:9944'   --vault-config-file args.txt
+cargo run --features=brooklyn --bin runner -- --parachain-ws 'ws://localhost:9944'   --vault-config-file args.txt
 ```
 
 <p align="center">
@@ -87,4 +87,4 @@ cargo run --features=parachain-metadata-kintsugi --bin runner -- --parachain-ws 
 
 On `cargo test` the embedded parachain node in the integration tests can consume a lot of resources. Currently the best workaround is to increase the resource limits of the current user.
 
-Use `ulimit -a` to list the current resource limits. To increase the maximum number of files set `ulimit -n 4096` or some other reasonable limit. 
+Use `ulimit -a` to list the current resource limits. To increase the maximum number of files set `ulimit -n 4096` or some other reasonable limit.

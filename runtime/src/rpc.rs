@@ -50,15 +50,20 @@ const BLAKE2_128_HASH_PREFIX_LENGTH: usize = 48;
 const TWOX_64_HASH_PREFIX_LENGTH: usize = 40;
 
 // sanity check to be sure that testing-utils is not accidentally selected
-#[cfg(all(any(test, feature = "testing-utils"), not(feature = "metadata-ggx-dev")))]
+#[cfg(all(any(test, feature = "testing-utils"), not(feature = "brooklyn")))]
 compile_error!("Tests are only supported for the ggx-dev runtime");
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "metadata-ggx-dev")] {
+    if #[cfg(feature = "brooklyn")] {
         const DEFAULT_SPEC_VERSION: Range<u32> = 1..1026000;
         pub const DEFAULT_SPEC_NAME: &str = "ggxchain-node";
         pub const SS58_PREFIX: u16 = 8886; // should be this one for both dev/brooklyn...
-    } else {
+    } else if #[cfg(feature = "sydney")] {
+        const DEFAULT_SPEC_VERSION: Range<u32> = 1..1026000;
+        pub const DEFAULT_SPEC_NAME: &str = "ggxchain-node";
+        pub const SS58_PREFIX: u16 = 8886;// TODO(Bohdan): is this correct number?
+    }
+    else {
         compile_error!("No parachain metadata feature selected");
     }
 }

@@ -5,7 +5,7 @@ authors = ["Interlay <contact@interlay.io>"]
 edition = "2018"
 
 [features]
-default = []
+default = ["testutil/brooklyn"]
 regtest-manual-mining = []
 cli = ["clap"]
 # uses-bitcoind = ["regtest-manual-mining"]
@@ -27,7 +27,7 @@ num = "0.2"
 num-traits = "0.2"
 num-derive = "0.3"
 futures = "0.3.5"
-log = "0.4.0"
+log = "0.4.20"
 hyper = "0.14.27"
 sha2 = "0.8.2"
 cfg-if = "1.0"
@@ -46,4 +46,4 @@ mockall = "0.8.1"
 regex = "1.4.3"
 rand = "0.7"
 serial_test = "*"
-testutil = { path = "../testutil" }
+testutil = { git = "https://github.com/ggxchain/testutil/", rev = "32601b997b20bfad6aee998487054e6115d8954c" }

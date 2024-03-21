@@ -1,4 +1,4 @@
-#![cfg(all(feature = "testing-utils", feature = "metadata-ggx-dev"))]
+#![cfg(all(feature = "testing-utils", feature = "brooklyn"))]
 #![allow(dead_code)]
 #![allow(unused_imports)]
 #![allow(unused_variables)]

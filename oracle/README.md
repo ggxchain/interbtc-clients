@@ -4,9 +4,9 @@ Automated price feeder for interBTC. Values can be set manually or imported from
 
 ## Examples
 
-To use a fixed price for BTC/DOT and coingecko for BTC/INTR, use e.g.: 
+To use a fixed price for BTC/DOT and coingecko for BTC/INTR, use e.g.:
 ```shell
-cargo run --bin oracle --features parachain-metadata-kintsugi -- --keyring alice --coingecko-url https://api.coingecko.com/api/v3 --oracle-config config.json
+cargo run --bin oracle --features brooklyn -- --keyring alice --coingecko-url https://api.coingecko.com/api/v3 --oracle-config config.json
 ```
 
 With the `config.json`:
@@ -57,7 +57,7 @@ With the `config.json`:
 When using cargo to run this binary, arguments to cargo and the binary are separated by `--`. For example, to pass `--help` to the tool to get a list of all command line options that is guaranteed to be up date, run:
 
 ```
-cargo run --bin oracle --features parachain-metadata-kintsugi -- --help
+cargo run --bin oracle --features brooklyn -- --help
 ```
 
 For convenience, a modified version of this output is included below.

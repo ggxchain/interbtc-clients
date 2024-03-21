@@ -665,7 +665,7 @@ pub async fn publish_tokio_metrics(
     }
 }
 
-#[cfg(all(test, feature = "parachain-metadata-kintsugi"))]
+#[cfg(all(test, feature = "brooklyn"))]
 mod tests {
     use super::*;
     use crate::connection_manager::DynBitcoinCoreApi;

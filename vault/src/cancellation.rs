@@ -311,7 +311,7 @@ impl<P: IssuePallet + ReplacePallet + UtilFuncs + SecurityPallet + Clone> Cancel
     }
 }
 
-#[cfg(all(test, feature = "parachain-metadata-kintsugi"))]
+#[cfg(all(test, feature = "brooklyn"))]
 mod tests {
     use super::*;
     use async_trait::async_trait;

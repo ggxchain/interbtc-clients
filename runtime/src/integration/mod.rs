@@ -1,5 +1,4 @@
 #![cfg(feature = "testing-utils")]
-
 mod bitcoin_simulator;
 use crate::{
     rpc::{IssuePallet, OraclePallet, SudoPallet, VaultRegistryPallet},
@@ -23,7 +22,7 @@ type DynBitcoinCoreApi = Arc<dyn BitcoinCoreApi + Send + Sync>;
 pub use bitcoin_simulator::MockBitcoinCore;
 
 use testutil::{
-    ggx::{GgxNodeContainer, GgxNodeImage},
+    containers::ggx::{GgxNodeContainer, GgxNodeImage},
     Cli,
 };
 

@@ -377,7 +377,7 @@ mod tests {
     };
     use serial_test::serial;
     use std::sync::Arc;
-    use testutil::{ggx::GgxNodeContainer, Cli};
+    use testutil::{containers::ggx::GgxNodeContainer, Cli};
     const DEFAULT_TESTING_CURRENCY: CurrencyId = Token(KSM);
     const DEFAULT_GOVERNANCE_CURRENCY: CurrencyId = Token(KINT);
     const DEFAULT_WRAPPED_CURRENCY: CurrencyId = Token(KBTC);
@@ -412,7 +412,7 @@ mod tests {
     }
 
     async fn endow_accounts(container: &GgxNodeContainer<'_>) {
-        let provider = setup_provider(AccountKeyring::Alice, &container).await;
+        let provider = setup_provider(AccountKeyring::Alice, container).await;
         provider
             .set_balances(
                 vec![AccountKeyring::Alice, AccountKeyring::Bob]

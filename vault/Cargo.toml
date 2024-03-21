@@ -6,10 +6,10 @@ edition = "2018"
 description = "The Vault client intermediates between Bitcoin Core and the BTC Parachain."
 
 [features]
-metadata-ggx-dev = ["runtime/metadata-ggx-dev"]
-# parachain-metadata-interlay = ["runtime/parachain-metadata-interlay"]
-# parachain-metadata-kintsugi = ["runtime/parachain-metadata-kintsugi", "bitcoin/light-client"]
-uses-bitcoind = [] # run tests relying on bitcoind regtest node
+defaut = []
+brooklyn = ["runtime/brooklyn", "testutil/brooklyn"]
+sydney = ["runtime/sydney", "testutil/sydney"]
+uses-bitcoind = []                                   # run tests relying on bitcoind regtest node
 
 [dependencies]
 thiserror = "1.0"
@@ -72,4 +72,4 @@ bitcoin = { path = "../bitcoin", features = ["cli", "regtest-manual-mining"] }
 # Substrate dependencies
 frame-support = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.43" }
 
-testutil = { path = "../testutil" }
+testutil = { git = "https://github.com/ggxchain/testutil/", rev = "32601b997b20bfad6aee998487054e6115d8954c" }

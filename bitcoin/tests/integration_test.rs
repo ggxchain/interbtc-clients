@@ -1,7 +1,7 @@
 use bitcoin::{Auth, BitcoinCore, BitcoinCoreApi, BitcoinCoreBuilder, Error, Network, PrivateKey, PublicKey};
 use regex::Regex;
 use testutil::{
-    btc::{BtcNodeContainer, BtcNodeImage},
+    containers::btc::{BtcNodeContainer, BtcNodeImage},
     Cli,
 };
 

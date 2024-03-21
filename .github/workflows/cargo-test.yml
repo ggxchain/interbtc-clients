@@ -21,8 +21,9 @@ jobs:
 
     strategy:
       matrix:
-        metadata:
-          - metadata-ggx-dev
+        feature:
+          - brooklyn
+          - sydney
 
     steps:
       - uses: actions/checkout@v4
@@ -44,12 +45,12 @@ jobs:
       - run: rustup component add clippy
       - name: clippy
         run: |
-          cargo clippy --release --workspace --features ${{ matrix.metadata }}
+          cargo clippy --release --workspace --features ${{ matrix.feature }}
       - name: check
         run: |
-          cargo check --release --workspace --features ${{ matrix.metadata }}
+          cargo check --release --workspace --features ${{ matrix.feature }}
       - name: test
-        if: matrix.metadata == 'metadata-ggx-dev'
+        if: matrix.feature == 'brooklyn'
         env:
           RUST_LOG: info,regalloc=warn
           BITCOIN_RPC_URL: http://127.0.0.1:18443
@@ -58,14 +59,14 @@ jobs:
           ELECTRS_URL: http://localhost:3002
         run: |
           docker-compose up -d bitcoind bitcoin-cli electrs
-          cargo test --release --workspace --features ${{ matrix.metadata }} --features uses-bitcoind
+          cargo test --release --workspace --features ${{ matrix.feature }} --features uses-bitcoind
       - name: build
         run: |
-          cargo build --release --workspace --features ${{ matrix.metadata }}
+          cargo build --release --workspace --features ${{ matrix.feature }}
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: vault-${{ matrix.metadata }}
+          name: vault-${{ matrix.feature }}
           path: |
             target/release/vault
             target/release/oracle
@@ -83,7 +84,7 @@ jobs:
   #       client: ["oracle", "vault", "faucet"]
   #       metadata:
   #         - parachain-metadata-interlay
-  #         - parachain-metadata-kintsugi
+  #         - brooklyn
   #   steps:
   #     - uses: actions/checkout@v4
   #     - name: Prepare

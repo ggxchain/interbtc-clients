@@ -1,4 +1,5 @@
 FROM rustlang/rust:nightly-bookworm as builder
+ARG FEATURE
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update --yes && \
     apt-get install --yes --no-install-recommends \
@@ -16,7 +17,7 @@ RUN apt-get update --yes && \
 RUN rustup target add wasm32-unknown-unknown
 WORKDIR /usr/src/app
 COPY . .
-RUN cargo build --locked --release
+RUN cargo build --locked --release --features=$FEATURE
 RUN cd target/release \
     && chmod +x vault oracle faucet
 
