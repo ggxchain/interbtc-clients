@@ -11,10 +11,11 @@ path = "src/lib.rs"
 
 [features]
 default = []
-brooklyn = ["runtime/brooklyn", "testutil/brooklyn"]
-sydney = ["runtime/sydney", "testutil/sydney"]
+brooklyn = ["runtime/brooklyn"]
+sydney = ["runtime/sydney"]
 
 [dependencies]
+testutil = { git = "https://github.com/ggxchain/testutil/", rev = "2d5cd67d5acaf701390f971342d0683b2b19f6dd" }
 log = "0.4.6"
 env_logger = "0.6.1"
 clap = { version = "4.0.17", features = ["derive"] }
@@ -47,5 +48,3 @@ runtime = { path = "../runtime", features = ["testing-utils"] }
 
 # Substrate dependencies
 sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.43" }
-
-testutil = { git = "https://github.com/ggxchain/testutil/", rev = "32601b997b20bfad6aee998487054e6115d8954c" }

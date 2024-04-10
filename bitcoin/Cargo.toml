@@ -5,13 +5,14 @@ authors = ["Interlay <contact@interlay.io>"]
 edition = "2018"
 
 [features]
-default = ["testutil/brooklyn"]
+default = []
 regtest-manual-mining = []
 cli = ["clap"]
 # uses-bitcoind = ["regtest-manual-mining"]
 light-client = []
 
 [dependencies]
+testutil = { git = "https://github.com/ggxchain/testutil/", rev = "2d5cd67d5acaf701390f971342d0683b2b19f6dd" }
 thiserror = "1.0"
 bitcoincore-rpc = { git = "https://github.com/rust-bitcoin/rust-bitcoincore-rpc", rev = "7bd815f1e1ae721404719ee8e6867064b7c68494" }
 hex = "0.4.2"
@@ -46,4 +47,3 @@ mockall = "0.8.1"
 regex = "1.4.3"
 rand = "0.7"
 serial_test = "*"
-testutil = { git = "https://github.com/ggxchain/testutil/", rev = "32601b997b20bfad6aee998487054e6115d8954c" }

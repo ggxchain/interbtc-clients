@@ -7,11 +7,12 @@ description = "The Vault client intermediates between Bitcoin Core and the BTC P
 
 [features]
 defaut = []
-brooklyn = ["runtime/brooklyn", "testutil/brooklyn"]
-sydney = ["runtime/sydney", "testutil/sydney"]
-uses-bitcoind = []                                   # run tests relying on bitcoind regtest node
+brooklyn = ["runtime/brooklyn"]
+sydney = ["runtime/sydney"]
+uses-bitcoind = []              # run tests relying on bitcoind regtest node
 
 [dependencies]
+testutil = { git = "https://github.com/ggxchain/testutil/", rev = "2d5cd67d5acaf701390f971342d0683b2b19f6dd" }
 thiserror = "1.0"
 backoff = { version = "0.3.0", features = ["tokio"] }
 clap = { version = "4.0.17", features = ["derive"] }
@@ -71,5 +72,3 @@ bitcoin = { path = "../bitcoin", features = ["cli", "regtest-manual-mining"] }
 
 # Substrate dependencies
 frame-support = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.43" }
-
-testutil = { git = "https://github.com/ggxchain/testutil/", rev = "32601b997b20bfad6aee998487054e6115d8954c" }
