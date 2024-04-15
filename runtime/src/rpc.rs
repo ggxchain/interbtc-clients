@@ -1377,6 +1377,8 @@ pub trait BtcRelayPallet {
 
     async fn get_block_header(&self, hash: H256Le) -> Result<InterBtcRichBlockHeader, Error>;
 
+    async fn get_utxo(&self, hash: H256Le, index: u32) -> Result<u64, Error>;
+
     async fn get_bitcoin_confirmations(&self) -> Result<u32, Error>;
 
     async fn get_parachain_confirmations(&self) -> Result<BlockNumber, Error>;
@@ -1429,6 +1431,16 @@ impl BtcRelayPallet for InterBtcParachain {
     async fn get_block_header(&self, hash: H256Le) -> Result<InterBtcRichBlockHeader, Error> {
         Ok(self
             .query_finalized_or_default(metadata::storage().btc_relay().block_headers(&hash))
+            .await?)
+    }
+
+    /// Get the corresponding block header for the given hash.
+    ///
+    /// # Arguments
+    /// * `hash` - little endian block hash
+    async fn get_utxo(&self, hash: H256Le, index: u32) -> Result<u64, Error> {
+        Ok(self
+            .query_finalized_or_default(metadata::storage().btc_relay().monitor_utxo(&hash, index))
             .await?)
     }
 

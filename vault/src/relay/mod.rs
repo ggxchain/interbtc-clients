@@ -8,10 +8,14 @@ use crate::delay::RandomDelay;
 mod backing;
 mod error;
 mod issuing;
+mod utxo_monitor;
 
 pub use backing::Backing;
+use bitcoin::TransactionExt;
 pub use error::Error;
 pub use issuing::Issuing;
+pub use utxo_monitor::UtxoMonitor;
+pub use bitcoin::blockdata::transaction::Transaction;
 
 // 10 minutes = 600 seconds
 const SLEEP_TIME: Duration = Duration::from_secs(600);
@@ -73,9 +77,10 @@ pub struct Config {
 }
 
 /// Runner implements the main loop for the relayer
-pub struct Runner<B: Backing, I: Issuing> {
+pub struct Runner<B: Backing, I: Issuing, U: UtxoMonitor> {
     backing: B,
     issuing: I,
+    utxoMonitor: U,
     random_delay: Arc<Box<dyn RandomDelay + Send + Sync>>,
     start_height: Option<u32>,
     max_batch_size: u32,
@@ -83,16 +88,18 @@ pub struct Runner<B: Backing, I: Issuing> {
     btc_confirmations: u32,
 }
 
-impl<B: Backing, I: Issuing> Runner<B, I> {
+impl<B: Backing, I: Issuing, U: UtxoMonitor> Runner<B, I, U> {
     pub fn new(
         backing: B,
         issuing: I,
+        utxoMonitor: U,
         conf: Config,
         random_delay: Arc<Box<dyn RandomDelay + Send + Sync>>,
-    ) -> Runner<B, I> {
+    ) -> Runner<B, I, U> {
         Runner {
             backing,
             issuing,
+            utxoMonitor,
             random_delay,
             start_height: conf.start_height,
             max_batch_size: conf.max_batch_size,
@@ -106,6 +113,19 @@ impl<B: Backing, I: Issuing> Runner<B, I> {
         loop {
             match self.backing.get_block_header(height).await? {
                 Some(header) => return Ok(header),
+                None => {
+                    tracing::trace!("No block found at height {}, sleeping for {:?}", height, self.interval);
+                    sleep(self.interval).await
+                }
+            };
+        }
+    }
+
+    /// Returns the block txs at `height`
+    async fn get_block_txs(&self, height: u32) -> Result<Vec<Transaction>, Error> {
+        loop {
+            match self.backing.get_block_txs(height).await? {
+                Some(txs) => return Ok(txs),
                 None => {
                     tracing::trace!("No block found at height {}, sleeping for {:?}", height, self.interval);
                     sleep(self.interval).await
@@ -161,6 +181,22 @@ impl<B: Backing, I: Issuing> Runner<B, I> {
                 self.issuing
                     .submit_block_header(header, self.random_delay.clone())
                     .await?;
+
+                let txs = self.get_block_txs(current_height).await?;
+
+                for tx in txs {
+                    let largest = tx
+                        .input
+                        .iter()
+                        .filter_map(|vin| {
+                            if self.UtxoMonitor.is_utxo_need_stored(vin.previous_output.txid, vin.previous_output.vout) {
+                                self.UtxoMonitor.submit_utxo_in_block(tx, current_height, self.random_delay.clone());
+                            } 
+                        })
+                        .max()
+                        .unwrap_or_default();
+                }
+                
                 tracing::info!("Submitted block at height {}", current_height);
             }
             _ => {
