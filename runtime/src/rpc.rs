@@ -1381,6 +1381,8 @@ pub trait BtcRelayPallet {
 
     async fn get_block_header(&self, hash: H256Le) -> Result<InterBtcRichBlockHeader, Error>;
 
+    async fn get_utxo(&self, hash: H256Le, index: u32) -> Result<(Static<BtcAddress>, u64), Error>;
+
     async fn get_bitcoin_confirmations(&self) -> Result<u32, Error>;
 
     async fn get_parachain_confirmations(&self) -> Result<BlockNumber, Error>;
@@ -1433,6 +1435,16 @@ impl BtcRelayPallet for InterBtcParachain {
     async fn get_block_header(&self, hash: H256Le) -> Result<InterBtcRichBlockHeader, Error> {
         Ok(self
             .query_finalized_or_default(metadata::storage().btc_relay().block_headers(&hash))
+            .await?)
+    }
+
+    /// Get the corresponding block header for the given hash.
+    ///
+    /// # Arguments
+    /// * `hash` - little endian block hash
+    async fn get_utxo(&self, hash: H256Le, index: u32) -> Result<(Static<BtcAddress>, u64), Error> {
+        Ok(self
+            .query_finalized_or_default(metadata::storage().btc_relay().monitor_utxo(&hash, index))
             .await?)
     }
 
@@ -1953,4 +1965,51 @@ pub fn build_full_tx_proof(raw_proof: &RawTransactionProof) -> Result<Static<Ful
             merkle_proof: MerkleProof::parse(&raw_proof.coinbase_tx_proof[..])?,
         },
     }))
+}
+
+#[async_trait]
+pub trait NftsPallet {
+    async fn get_collection_id(&self) -> Result<u32, Error>;
+
+    async fn create_id(&self, admin: &AccountId) -> Result<(), Error>;
+    async fn mint(&self, collection: u32, mint_to: &AccountId) -> Result<(), Error>;
+    async fn set_metadata(&self, collection: u32, data: Vec<u8>) -> Result<(), Error>;
+}
+
+#[async_trait]
+impl NftsPallet for InterBtcParachain {
+    async fn get_collection_id(&self) -> Result<u32, Error> {
+        Ok(self
+            .query_finalized_or_error(metadata::storage().nfts().next_collection_id())
+            .await?)
+    }
+
+    async fn create_id(&self, admin: &AccountId) -> Result<(), Error> {
+        self.with_unique_signer(
+            metadata::tx()
+                .psp37()
+                .create_id(subxt::utils::MultiAddress::Id(admin.clone())),
+        )
+        .await?;
+        Ok(())
+    }
+
+    async fn mint(&self, collection: u32, mint_to: &AccountId) -> Result<(), Error> {
+        self.with_unique_signer(
+            metadata::tx()
+                .psp37()
+                .mint(collection, subxt::utils::MultiAddress::Id(mint_to.clone())),
+        )
+        .await?;
+        Ok(())
+    }
+
+    async fn set_metadata(&self, collection: u32, data: Vec<u8>) -> Result<(), Error> {
+        self.with_unique_signer(metadata::tx().psp37().set_metadata(
+            collection,
+            metadata::runtime_types::bounded_collections::bounded_vec::BoundedVec(vec![]),
+        ))
+        .await?;
+        Ok(())
+    }
 }

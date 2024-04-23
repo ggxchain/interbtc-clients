@@ -31,8 +31,8 @@ pub use retry::{notify_retry, RetryPolicy};
 pub use rpc::SudoPallet;
 pub use rpc::{
     BtcRelayPallet, CollateralBalancesPallet, FeePallet, FeeRateUpdateReceiver, InterBtcParachain, IssuePallet,
-    OraclePallet, RedeemPallet, ReplacePallet, SecurityPallet, TimestampPallet, UtilFuncs, VaultRegistryPallet,
-    DEFAULT_SPEC_NAME, SS58_PREFIX,
+    NftsPallet, OraclePallet, RedeemPallet, ReplacePallet, SecurityPallet, TimestampPallet, UtilFuncs,
+    VaultRegistryPallet, DEFAULT_SPEC_NAME, SS58_PREFIX,
 };
 pub use shutdown::{ShutdownReceiver, ShutdownSender};
 pub use sp_arithmetic::{traits as FixedPointTraits, FixedI128, FixedPointNumber, FixedU128};
