@@ -2,12 +2,12 @@ use crate::{
     delay::RandomDelay, metrics::publish_expected_bitcoin_balance, service::DynBitcoinCoreApi, Error, Event,
     IssueRequests, VaultIdManager,
 };
-use bitcoin::{BlockHash, Error as BitcoinError, Hash, PublicKey, Transaction, TransactionExt};
+use bitcoin::{Address, BlockHash, Error as BitcoinError, Hash, PublicKey, Transaction, TransactionExt};
 use futures::{channel::mpsc::Sender, future, SinkExt, StreamExt, TryFutureExt};
 use runtime::{
-    BtcAddress, BtcPublicKey, BtcRelayPallet, CancelIssueEvent, ExecuteIssueEvent, H256Le, InterBtcIssueRequest,
-    InterBtcParachain, IssuePallet, IssueRequestStatus, NftsPallet, PartialAddress, PrettyPrint, RequestIssueEvent,
-    UtilFuncs, VaultId, H256,
+    sp_core, BtcAddress, BtcPublicKey, BtcRelayPallet, CancelIssueEvent, ExecuteIssueEvent, H256Le,
+    InterBtcIssueRequest, InterBtcParachain, IssuePallet, IssueRequestStatus, NftsPallet, PartialAddress, PrettyPrint,
+    RequestIssueEvent, UtilFuncs, VaultId, H256,
 };
 use sha2::{Digest, Sha256};
 use std::{
@@ -234,20 +234,20 @@ async fn process_transaction_and_execute_issue(
     random_delay: Arc<Box<dyn RandomDelay + Send + Sync>>,
 ) -> Result<(), Error> {
     use std::{convert::TryInto, hash::Hash};
-    // todo list multi in double map utxo
 
-    //todo iter the transaction output index
     for i in 0..transaction.output.len() {
-        if let utxo_info = btc_parachain
-            .get_utxo(
-                H256Le::from_bytes_le(&transaction.txid().to_byte_array()),
-                i.try_into().unwrap(),
-            )
-            .await?
-        {
+        let mut txid_byte_array = transaction.txid().to_byte_array();
+        txid_byte_array.reverse();
+        let txid_h256_le = H256Le::from_bytes_le(&txid_byte_array);
+
+        let index: u32 = i.try_into().unwrap();
+        if let Ok(utxo_info) = btc_parachain.get_utxo(txid_h256_le, 0).await {
             let address = utxo_info.0;
 
-            let collection = btc_parachain.get_collection_id().await?;
+            let collection = match btc_parachain.get_collection_id().await {
+                Ok(v) => v,
+                _ => 0u32,
+            };
 
             // todo get binding ggx address to mint_to
             let mint_to = btc_parachain.get_account_id();
@@ -255,7 +255,7 @@ async fn process_transaction_and_execute_issue(
 
             btc_parachain.mint(collection, mint_to).await?;
 
-            btc_parachain.set_metadata(collection, vec![]).await?;
+            btc_parachain.set_metadata(collection, vec![1]).await?;
         }
     }
 

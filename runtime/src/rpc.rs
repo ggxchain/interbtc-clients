@@ -1383,6 +1383,12 @@ pub trait BtcRelayPallet {
 
     async fn get_utxo(&self, hash: H256Le, index: u32) -> Result<(Static<BtcAddress>, u64), Error>;
 
+    async fn get_address_boomerage_utxo(
+        &self,
+        address: BtcAddress,
+        index: u32,
+    ) -> Result<(H256Le, u32, u32, u64), Error>;
+
     async fn get_bitcoin_confirmations(&self) -> Result<u32, Error>;
 
     async fn get_parachain_confirmations(&self) -> Result<BlockNumber, Error>;
@@ -1438,13 +1444,27 @@ impl BtcRelayPallet for InterBtcParachain {
             .await?)
     }
 
-    /// Get the corresponding block header for the given hash.
+    /// Get the utxo detail for the given tx hash and index.
     ///
     /// # Arguments
-    /// * `hash` - little endian block hash
+    /// * `hash` - little endian tx hash
     async fn get_utxo(&self, hash: H256Le, index: u32) -> Result<(Static<BtcAddress>, u64), Error> {
         Ok(self
-            .query_finalized_or_default(metadata::storage().btc_relay().monitor_utxo(&hash, index))
+            .query_finalized_or_error(metadata::storage().btc_relay().monitor_utxo(&hash, index))
+            .await?)
+    }
+
+    /// Get the utxo detail for the given address and index.
+    ///
+    /// # Arguments
+    /// * `hash` - little endian tx hash
+    async fn get_address_boomerage_utxo(
+        &self,
+        address: BtcAddress,
+        index: u32,
+    ) -> Result<(H256Le, u32, u32, u64), Error> {
+        Ok(self
+            .query_finalized_or_error(metadata::storage().btc_relay().boomerage_utxos(Static(address), index))
             .await?)
     }
 
@@ -1979,9 +1999,10 @@ pub trait NftsPallet {
 #[async_trait]
 impl NftsPallet for InterBtcParachain {
     async fn get_collection_id(&self) -> Result<u32, Error> {
-        Ok(self
+        let rt = self
             .query_finalized_or_error(metadata::storage().nfts().next_collection_id())
-            .await?)
+            .await?;
+        Ok(rt)
     }
 
     async fn create_id(&self, admin: &AccountId) -> Result<(), Error> {
