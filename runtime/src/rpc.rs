@@ -1386,8 +1386,10 @@ pub trait BtcRelayPallet {
     async fn get_address_boomerage_utxo(
         &self,
         address: BtcAddress,
-        index: u32,
-    ) -> Result<(H256Le, u32, u32, u64), Error>;
+        index: u64,
+    ) -> Result<(H256Le, u32, u32, u64, u32, u64), Error>;
+
+    async fn get_address_bitcoin_to_ggx(&self, address: BtcAddress) -> Result<AccountId, Error>;
 
     async fn get_bitcoin_confirmations(&self) -> Result<u32, Error>;
 
@@ -1406,6 +1408,15 @@ pub trait BtcRelayPallet {
     async fn store_block_header(&self, header: RawBlockHeader) -> Result<(), Error>;
 
     async fn store_block_headers(&self, headers: Vec<RawBlockHeader>) -> Result<(), Error>;
+
+    async fn store_boomerage_utxo_token_id(
+        &self,
+        address: BtcAddress,
+        index: u64,
+        collection: u32,
+    ) -> Result<(), Error>;
+
+    async fn update_store_utxo_to_spent(&self, txid: H256Le, index: u32, height: BlockNumber) -> Result<(), Error>;
 }
 
 #[async_trait]
@@ -1461,10 +1472,20 @@ impl BtcRelayPallet for InterBtcParachain {
     async fn get_address_boomerage_utxo(
         &self,
         address: BtcAddress,
-        index: u32,
-    ) -> Result<(H256Le, u32, u32, u64), Error> {
+        index: u64,
+    ) -> Result<(H256Le, u32, u32, u64, u32, u64), Error> {
         Ok(self
             .query_finalized_or_error(metadata::storage().btc_relay().boomerage_utxos(Static(address), index))
+            .await?)
+    }
+
+    /// Get ggx address from bitcoin address.
+    ///
+    /// # Arguments
+    /// * `hash` - little endian tx hash
+    async fn get_address_bitcoin_to_ggx(&self, address: BtcAddress) -> Result<AccountId, Error> {
+        Ok(self
+            .query_finalized_or_error(metadata::storage().btc_relay().address_bitcoin_to_ggx(Static(address)))
             .await?)
     }
 
@@ -1576,6 +1597,33 @@ impl BtcRelayPallet for InterBtcParachain {
                 .collect(),
         )
         .await
+    }
+
+    async fn store_boomerage_utxo_token_id(
+        &self,
+        address: BtcAddress,
+        index: u64,
+        collection: u32,
+    ) -> Result<(), Error> {
+        self.with_unique_signer(metadata::tx().btc_relay().store_boomerage_utxo_token_id(
+            Static(address),
+            index,
+            collection,
+        ))
+        .await?;
+
+        Ok(())
+    }
+
+    async fn update_store_utxo_to_spent(&self, txid: H256Le, index: u32, height: BlockNumber) -> Result<(), Error> {
+        self.with_unique_signer(
+            metadata::tx()
+                .btc_relay()
+                .update_store_utxo_to_spent(txid, index, height),
+        )
+        .await?;
+
+        Ok(())
     }
 }
 
@@ -1994,6 +2042,7 @@ pub trait NftsPallet {
     async fn create_id(&self, admin: &AccountId) -> Result<(), Error>;
     async fn mint(&self, collection: u32, mint_to: &AccountId) -> Result<(), Error>;
     async fn set_metadata(&self, collection: u32, data: Vec<u8>) -> Result<(), Error>;
+    async fn burn(&self, collection: u32) -> Result<(), Error>;
 }
 
 #[async_trait]
@@ -2028,9 +2077,15 @@ impl NftsPallet for InterBtcParachain {
     async fn set_metadata(&self, collection: u32, data: Vec<u8>) -> Result<(), Error> {
         self.with_unique_signer(metadata::tx().psp37().set_metadata(
             collection,
-            metadata::runtime_types::bounded_collections::bounded_vec::BoundedVec(vec![]),
+            metadata::runtime_types::bounded_collections::bounded_vec::BoundedVec(data),
         ))
         .await?;
+        Ok(())
+    }
+
+    async fn burn(&self, collection: u32) -> Result<(), Error> {
+        self.with_unique_signer(metadata::tx().nfts().burn(collection, 0u32))
+            .await?;
         Ok(())
     }
 }

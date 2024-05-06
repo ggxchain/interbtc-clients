@@ -1,7 +1,11 @@
 use crate::{
-    delay::RandomDelay, metrics::publish_expected_bitcoin_balance, service::DynBitcoinCoreApi, Error, Event,
-    IssueRequests, VaultIdManager,
+    delay::RandomDelay,
+    metrics::publish_expected_bitcoin_balance,
+    service::DynBitcoinCoreApi,
+    verify::{check_script_in_utxo, check_spend_uxto_is_locktime},
+    Error, Event, IssueRequests, VaultIdManager,
 };
+
 use bitcoin::{Address, BlockHash, Error as BitcoinError, Hash, PublicKey, Transaction, TransactionExt};
 use futures::{channel::mpsc::Sender, future, SinkExt, StreamExt, TryFutureExt};
 use runtime::{
@@ -235,27 +239,88 @@ async fn process_transaction_and_execute_issue(
 ) -> Result<(), Error> {
     use std::{convert::TryInto, hash::Hash};
 
-    for i in 0..transaction.output.len() {
-        let mut txid_byte_array = transaction.txid().to_byte_array();
-        txid_byte_array.reverse();
-        let txid_h256_le = H256Le::from_bytes_le(&txid_byte_array);
+    let mut txid_byte_array = transaction.txid().to_byte_array();
+    txid_byte_array.reverse();
+    let txid_h256_le = H256Le::from_bytes_le(&txid_byte_array);
 
-        let index: u32 = i.try_into().unwrap();
-        if let Ok(utxo_info) = btc_parachain.get_utxo(txid_h256_le, 0).await {
-            let address = utxo_info.0;
+    let rpc = bitcoincore_rpc::Client::new(
+        "http://localhost:18332",
+        bitcoincore_rpc::Auth::UserPass("rpcuser".to_string(), "rpcpassword".to_string()),
+    )
+    .unwrap();
+
+    // mint
+    for i in 0..transaction.output.len() {
+        let index: u32 = i.try_into().unwrap_or_default();
+
+        let str_hex_tx_id = hex::encode(txid_byte_array);
+
+        // mint nfts
+        if let Ok(utxo_info) = btc_parachain.get_utxo(txid_h256_le.clone(), index).await {
+            let (address, address_index) = utxo_info;
+
+            //verify the utxo and script
+            if let Ok(boomerage_utxo_info) = btc_parachain.get_address_boomerage_utxo(*address, address_index).await {
+                //todo get user pubkey from ggxchain
+                let user_pubkey = "9997a497d964fc1a62885b05a51166a65a90df00492c8d7cf61d6accf54803be";
+
+                let ggx_pubkey = "9997a497d964fc1a62885b05a51166a65a90df00492c8d7cf61d6accf54803be";
+                if let Ok(rt) = check_spend_uxto_is_locktime(
+                    &rpc,
+                    boomerage_utxo_info.5.try_into().unwrap(),
+                    user_pubkey,
+                    &str_hex_tx_id,
+                ) {
+                } else {
+                    continue;
+                }
+
+                if let Ok(rt) = check_script_in_utxo(
+                    &rpc,
+                    &str_hex_tx_id,
+                    0,
+                    boomerage_utxo_info.5.try_into().unwrap(),
+                    user_pubkey,
+                    ggx_pubkey,
+                ) {
+                } else {
+                    continue;
+                }
+            }
 
             let collection = match btc_parachain.get_collection_id().await {
                 Ok(v) => v,
                 _ => 0u32,
             };
 
-            // todo get binding ggx address to mint_to
-            let mint_to = btc_parachain.get_account_id();
+            let mint_to = btc_parachain.get_address_bitcoin_to_ggx(*address).await?;
+
             btc_parachain.create_id(btc_parachain.get_account_id()).await?;
 
-            btc_parachain.mint(collection, mint_to).await?;
+            btc_parachain.mint(collection, &mint_to).await?;
 
             btc_parachain.set_metadata(collection, vec![1]).await?;
+
+            btc_parachain.store_boomerage_utxo_token_id(*address, 0, collection);
+        }
+    }
+
+    // burn
+    for i in 0..transaction.input.len() {
+        let u = &transaction.input[i];
+
+        let txid = u.previous_output.txid;
+        let txid_le = H256Le::from_bytes_le(&txid.to_byte_array());
+        let index: u32 = u.previous_output.vout;
+
+        if let Ok((address, address_index)) = btc_parachain.get_utxo(txid_le.clone(), index).await {
+            btc_parachain.update_store_utxo_to_spent(txid_le.clone(), index, 0);
+
+            if let Ok(boomerage_utxo_info) = btc_parachain.get_address_boomerage_utxo(*address, address_index).await {
+                let collection = boomerage_utxo_info.4;
+
+                btc_parachain.burn(collection);
+            }
         }
     }
 

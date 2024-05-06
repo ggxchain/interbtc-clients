@@ -707,7 +707,19 @@ version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8eb70725a621848c83b3809913d5314c0d20ca84877d99dd909504b564edab00"
 dependencies = [
- "bitcoincore-rpc-json 0.18.0",
+ "bitcoincore-rpc-json 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "jsonrpc",
+ "log",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "bitcoincore-rpc"
+version = "0.18.0"
+source = "git+https://github.com/rust-bitcoin/rust-bitcoincore-rpc#ce665f1545b2d1d036e5a8cdc079acd6c79b5029"
+dependencies = [
+ "bitcoincore-rpc-json 0.18.0 (git+https://github.com/rust-bitcoin/rust-bitcoincore-rpc)",
  "jsonrpc",
  "log",
  "serde",
@@ -730,6 +742,16 @@ name = "bitcoincore-rpc-json"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "856ffbee2e492c23bca715d72ea34aae80d58400f2bda26a82015d6bc2ec3662"
+dependencies = [
+ "bitcoin 0.31.2",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "bitcoincore-rpc-json"
+version = "0.18.0"
+source = "git+https://github.com/rust-bitcoin/rust-bitcoincore-rpc#ce665f1545b2d1d036e5a8cdc079acd6c79b5029"
 dependencies = [
  "bitcoin 0.31.2",
  "serde",
@@ -6599,7 +6621,7 @@ version = "0.1.0"
 source = "git+https://github.com/ggxchain/testutil/?rev=2d5cd67d5acaf701390f971342d0683b2b19f6dd#2d5cd67d5acaf701390f971342d0683b2b19f6dd"
 dependencies = [
  "bitcoin 1.2.0 (git+https://github.com/ggxchain/interbtc.git?branch=polkadot-v0.9.43)",
- "bitcoincore-rpc 0.18.0",
+ "bitcoincore-rpc 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex",
  "log",
  "subxt 0.31.0",
@@ -7126,7 +7148,9 @@ version = "1.1.0"
 dependencies = [
  "async-trait",
  "backoff",
+ "bitcoin 0.31.2",
  "bitcoin 1.1.0",
+ "bitcoincore-rpc 0.18.0 (git+https://github.com/rust-bitcoin/rust-bitcoincore-rpc)",
  "clap",
  "faucet",
  "frame-support",

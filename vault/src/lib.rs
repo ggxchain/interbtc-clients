@@ -16,6 +16,7 @@ mod replace;
 mod system;
 mod trace;
 mod types;
+mod verify;
 
 pub mod service {
     pub use crate::{
